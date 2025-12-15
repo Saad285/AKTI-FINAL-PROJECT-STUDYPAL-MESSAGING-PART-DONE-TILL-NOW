@@ -6,18 +6,14 @@ import 'package:gcr/studypal/messages/messages_screen.dart';
 import 'package:gcr/studypal/students/hometab.dart';
 import 'package:gcr/studypal/theme/app_colors.dart';
 import 'package:gcr/studypal/theme/app_theme.dart';
-
-class StudentHomepage extends StatefulWidget {
   const StudentHomepage({super.key});
 
   @override
   State<StudentHomepage> createState() => _StudentHomepageState();
 }
 
-class _StudentHomepageState extends State<StudentHomepage>
-    with TickerProviderStateMixin {
+class _StudentHomepageState extends State<StudentHomepage> {
   int _selectedIndex = 0;
-  late AnimationController _gradientController;
 
   final List<Widget> _pages = [
     const Hometab(),
@@ -27,21 +23,6 @@ class _StudentHomepageState extends State<StudentHomepage>
 
     const ClassesListScreen(),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _gradientController = AnimationController(
-      duration: const Duration(seconds: 6),
-      vsync: this,
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _gradientController.dispose();
-    super.dispose();
-  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -59,115 +40,66 @@ class _StudentHomepageState extends State<StudentHomepage>
         padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 40.h),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(50.r),
-          child: AnimatedBuilder(
-            animation: _gradientController,
-            builder: (context, child) {
-              // Rotate through gradient colors for smooth animation
-              List<Color> gradientColors;
-              if (_gradientController.value < 0.5) {
-                // First half: Transition from primary to secondary
-                final t = _gradientController.value * 2;
-                gradientColors = [
-                  Color.lerp(
-                    AppTheme.primaryGradient[0],
-                    AppTheme.secondaryGradient[0],
-                    t,
-                  )!,
-                  Color.lerp(
-                    AppTheme.primaryGradient[1],
-                    AppTheme.secondaryGradient[1],
-                    t,
-                  )!,
-                  Color.lerp(
-                    AppTheme.primaryGradient[2],
-                    AppTheme.secondaryGradient[2],
-                    t,
-                  )!,
-                ];
-              } else {
-                // Second half: Transition from secondary back to primary
-                final t = (_gradientController.value - 0.5) * 2;
-                gradientColors = [
-                  Color.lerp(
-                    AppTheme.secondaryGradient[0],
-                    AppTheme.primaryGradient[0],
-                    t,
-                  )!,
-                  Color.lerp(
-                    AppTheme.secondaryGradient[1],
-                    AppTheme.primaryGradient[1],
-                    t,
-                  )!,
-                  Color.lerp(
-                    AppTheme.secondaryGradient[2],
-                    AppTheme.primaryGradient[2],
-                    t,
-                  )!,
-                ];
-              }
-
-              return Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: gradientColors,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(50.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.2),
-                      blurRadius: 25,
-                      spreadRadius: 1,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: AppTheme.secondaryGradient,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(50.r),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.2),
+                  blurRadius: 25,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 10),
                 ),
-                child: Transform.translate(
-                  offset: const Offset(0.0, 4.0),
-                  child: BottomNavigationBar(
-                    currentIndex: _selectedIndex,
-                    onTap: _onItemTapped,
-                    type: BottomNavigationBarType.fixed,
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    selectedItemColor: Colors.white,
-                    unselectedItemColor: Colors.white.withOpacity(0.6),
-                    selectedFontSize: 0.0,
-                    unselectedFontSize: 0.0,
-                    showSelectedLabels: false,
-                    showUnselectedLabels: false,
-                    items: const [
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.home_outlined, size: 28),
-                        activeIcon: Icon(Icons.home, size: 32),
-                        label: '',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.chat_bubble_outline, size: 28),
-                        activeIcon: Icon(Icons.chat_bubble, size: 32),
-                        label: '',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.smart_toy_outlined, size: 28),
-                        activeIcon: Icon(Icons.smart_toy, size: 32),
-                        label: '',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.notifications_outlined, size: 28),
-                        activeIcon: Icon(Icons.notifications, size: 32),
-                        label: '',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.book_outlined, size: 28),
-                        activeIcon: Icon(Icons.book, size: 32),
-                        label: '',
-                      ),
-                    ],
+              ],
+            ),
+            child: Transform.translate(
+              offset: const Offset(0.0, 4.0),
+              child: BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                selectedItemColor: Colors.white,
+                unselectedItemColor: Colors.white.withOpacity(0.6),
+                selectedFontSize: 0.0,
+                unselectedFontSize: 0.0,
+                showSelectedLabels: false,
+                showUnselectedLabels: false,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home_outlined, size: 28),
+                    activeIcon: Icon(Icons.home, size: 32),
+                    label: '',
                   ),
-                ),
-              );
-            },
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.chat_bubble_outline, size: 28),
+                    activeIcon: Icon(Icons.chat_bubble, size: 32),
+                    label: '',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.smart_toy_outlined, size: 28),
+                    activeIcon: Icon(Icons.smart_toy, size: 32),
+                    label: '',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.notifications_outlined, size: 28),
+                    activeIcon: Icon(Icons.notifications, size: 32),
+                    label: '',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.book_outlined, size: 28),
+                    activeIcon: Icon(Icons.book, size: 32),
+                    label: '',
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
