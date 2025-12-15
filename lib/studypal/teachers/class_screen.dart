@@ -76,10 +76,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
           backgroundColor: AppColors.primary,
           elevation: 0,
           centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
+
           title: Text(
             "Manage Classes",
             style: GoogleFonts.poppins(

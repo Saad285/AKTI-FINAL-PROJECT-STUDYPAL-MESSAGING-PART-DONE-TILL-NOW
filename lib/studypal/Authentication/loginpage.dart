@@ -151,11 +151,7 @@ class _LoginScreenState extends State<LoginScreen>
                   gradient: LinearGradient(
                     begin: _topAlignmentAnimation.value,
                     end: _bottomAlignmentAnimation.value,
-                    colors: [
-                      Color(0xFFE0F7FA), // Light Cyan
-                      AppColors.primary.withOpacity(0.2),
-                      Color(0xFFF3E5F5), // Light Purple
-                    ],
+                    colors: AppColors.universalGradient,
                   ),
                 ),
               ),

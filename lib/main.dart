@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:gcr/firebase_options.dart';
 import 'package:gcr/studypal/Authentication/loginpage.dart';
+import 'package:gcr/studypal/theme/global_animated_background.dart';
 import 'package:gcr/studypal/providers/teacher_provider.dart';
 import 'package:gcr/studypal/students/homepage.dart';
 import 'package:gcr/studypal/theme/app_colors.dart';
@@ -60,10 +61,22 @@ class MyApp extends StatelessWidget {
                   body: Center(child: CircularProgressIndicator()),
                 );
               }
+              Widget content;
               if (snapshot.hasData) {
-                return const StudentHomepage();
+                content = const StudentHomepage();
+              } else {
+                content = const LoginScreen();
               }
-              return const LoginScreen();
+
+              // Wrap the chosen page with a single global animated background
+              return GlobalAnimatedBackground(
+                colors: [
+                  const Color(0xFFE0F7FA),
+                  AppColors.primary.withOpacity(0.2),
+                  const Color(0xFFF3E5F5),
+                ],
+                child: content,
+              );
             },
           ),
         );

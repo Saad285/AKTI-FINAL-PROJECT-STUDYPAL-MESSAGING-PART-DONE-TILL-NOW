@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class AppColors {
@@ -41,4 +42,20 @@ class AppColors {
     Color(0xFF4DB6AC), // Teal
     Color(0xFF7986CB), // Indigo/Lavender
   ];
+
+  // Universal app gradient (use these three everywhere)
+  // Colors specified by the user:
+  // const Color(0xFFE0F7FA), AppColors.primary.withOpacity(0.2), const Color(0xFFF3E5F5)
+  static final List<Color> universalGradient = [
+    const Color(0xFFE0F7FA),
+    primary.withOpacity(0.2),
+    const Color(0xFFF3E5F5),
+  ];
+
+  // Helper to pick a random aesthetic color for cards/subjects.
+  // Call `AppColors.randomAesthetic()` to receive a Color from `aestheticColors`.
+  static Color randomAesthetic([int? seed]) {
+    final rnd = (seed == null) ? Random() : Random(seed);
+    return aestheticColors[rnd.nextInt(aestheticColors.length)];
+  }
 }

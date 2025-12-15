@@ -15,7 +15,6 @@ import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
-import 'package:gcr/studypal/theme/animated_background.dart';
 import 'package:gcr/studypal/theme/app_theme.dart';
 
 class ChatBotScreen extends StatefulWidget {
@@ -494,189 +493,184 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBackground(
-      colors: AppTheme.accentGradient,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          centerTitle: true,
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.smart_toy_rounded,
-                  color: AppColors.primary,
-                  size: 20.sp,
-                ),
-              ),
-              SizedBox(width: 10.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "StudyPal Assistant",
-                    style: GoogleFonts.poppins(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.sp,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: _isTyping ? Colors.blue : Colors.green,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      SizedBox(width: 5.w),
-                      Text(
-                        _isTyping ? "Thinking..." : "Online",
-                        style: GoogleFonts.poppins(
-                          color: Colors.grey[500],
-                          fontSize: 12.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add, color: Colors.black54),
-              onPressed: _addTestNoteDialog, // Header main bhi shortcut de diya
-            ),
-          ],
-        ),
-        body: Column(
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: Row(
           children: [
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  final msg = _messages[index];
-                  final isUser = msg['isUser'];
-                  return Align(
-                    alignment: isUser
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 16.h),
-                      constraints: BoxConstraints(maxWidth: 0.75.sw),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 12.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isUser ? AppColors.primary : Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16.r),
-                          topRight: Radius.circular(16.r),
-                          bottomLeft: isUser
-                              ? Radius.circular(16.r)
-                              : Radius.zero,
-                          bottomRight: isUser
-                              ? Radius.zero
-                              : Radius.circular(16.r),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 5,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (msg['imageBytes'] != null)
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 8.h),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.r),
-                                child: Image.memory(
-                                  msg['imageBytes'],
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            )
-                          else if (msg['imagePath'] != null)
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 8.h),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.r),
-                                child: Image.file(File(msg['imagePath'])),
-                              ),
-                            )
-                          else if (msg['fileName'] != null)
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 8.h),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.insert_drive_file, size: 28),
-                                  SizedBox(width: 8.w),
-                                  Flexible(
-                                    child: Text(
-                                      msg['fileName'],
-                                      style: GoogleFonts.poppins(
-                                        color: isUser
-                                            ? Colors.white
-                                            : Colors.black87,
-                                        fontSize: 14.sp,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if ((msg['text'] ?? "").isNotEmpty)
-                            GptMarkdown(
-                              msg['text'],
-                              style: GoogleFonts.poppins(
-                                color: isUser ? Colors.white : Colors.black87,
-                                fontSize: 14.sp,
-                                height: 1.4,
-                              ),
-                            ),
-                          SizedBox(height: 4.h),
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: Text(
-                              msg['time'] ?? "",
-                              style: GoogleFonts.poppins(
-                                color: isUser
-                                    ? Colors.white70
-                                    : Colors.grey[400],
-                                fontSize: 10.sp,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.smart_toy_rounded,
+                color: AppColors.primary,
+                size: 20.sp,
               ),
             ),
-            _buildInputArea(),
+            SizedBox(width: 10.w),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "StudyPal Assistant",
+                  style: GoogleFonts.poppins(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _isTyping ? Colors.blue : Colors.green,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    SizedBox(width: 5.w),
+                    Text(
+                      _isTyping ? "Thinking..." : "Online",
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey[500],
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: Colors.black54),
+            onPressed: _addTestNoteDialog, // Header main bhi shortcut de diya
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final msg = _messages[index];
+                final isUser = msg['isUser'];
+                return Align(
+                  alignment: isUser
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: 16.h),
+                    constraints: BoxConstraints(maxWidth: 0.75.sw),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 12.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isUser ? AppColors.primary : Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.r),
+                        topRight: Radius.circular(16.r),
+                        bottomLeft: isUser
+                            ? Radius.circular(16.r)
+                            : Radius.zero,
+                        bottomRight: isUser
+                            ? Radius.zero
+                            : Radius.circular(16.r),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (msg['imageBytes'] != null)
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 8.h),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.r),
+                              child: Image.memory(
+                                msg['imageBytes'],
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        else if (msg['imagePath'] != null)
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 8.h),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.r),
+                              child: Image.file(File(msg['imagePath'])),
+                            ),
+                          )
+                        else if (msg['fileName'] != null)
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 8.h),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.insert_drive_file, size: 28),
+                                SizedBox(width: 8.w),
+                                Flexible(
+                                  child: Text(
+                                    msg['fileName'],
+                                    style: GoogleFonts.poppins(
+                                      color: isUser
+                                          ? Colors.white
+                                          : Colors.black87,
+                                      fontSize: 14.sp,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if ((msg['text'] ?? "").isNotEmpty)
+                          GptMarkdown(
+                            msg['text'],
+                            style: GoogleFonts.poppins(
+                              color: isUser ? Colors.white : Colors.black87,
+                              fontSize: 14.sp,
+                              height: 1.4,
+                            ),
+                          ),
+                        SizedBox(height: 4.h),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Text(
+                            msg['time'] ?? "",
+                            style: GoogleFonts.poppins(
+                              color: isUser ? Colors.white70 : Colors.grey[400],
+                              fontSize: 10.sp,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          _buildInputArea(),
+        ],
       ),
     );
   }

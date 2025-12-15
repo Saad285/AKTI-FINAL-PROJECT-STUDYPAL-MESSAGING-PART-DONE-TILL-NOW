@@ -2,23 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gcr/studypal/theme/app_colors.dart';
-import 'dart:math';
-
-// Note: ScheduleCard class requires getRandomColor to be defined.
-// We are defining the utility function here for this single file to run
-// (assuming AppColors.aestheticColors is defined elsewhere).
-
-final _random = Random();
-Color getRandomColor() {
-  // Using a fallback for demonstration, as aestheticColors is in another file
-  // In a real project, this function should be external in dashboard_helpers.dart
-  if (AppColors.aestheticColors.isEmpty) {
-    return const Color(0xFF757BC8); // Fallback color
-  }
-  return AppColors.aestheticColors[_random.nextInt(
-    AppColors.aestheticColors.length,
-  )];
-}
+// Use AppColors.randomAesthetic to assign card colors randomly
 
 class ScheduleCard extends StatelessWidget {
   final String subject;
@@ -40,7 +24,7 @@ class ScheduleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Random color applied for aesthetics
-    Color cardColor = getRandomColor().withOpacity(0.85);
+    Color cardColor = AppColors.randomAesthetic().withOpacity(0.85);
 
     return GestureDetector(
       onTap: onTap, // Card is clickable only if onTap is provided (not null)

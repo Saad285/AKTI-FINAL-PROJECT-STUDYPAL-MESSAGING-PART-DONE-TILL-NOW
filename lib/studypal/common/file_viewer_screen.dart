@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:gcr/studypal/theme/app_colors.dart';
-import 'package:gcr/studypal/theme/animated_background.dart';
 import 'package:gcr/studypal/theme/app_theme.dart';
 
 class FileViewerScreen extends StatefulWidget {
@@ -58,38 +57,35 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBackground(
-      colors: AppTheme.primaryGradient,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: AppColors.primary,
-          title: Text(
-            widget.fileName,
-            style: const TextStyle(fontSize: 16, color: Colors.white),
-            overflow: TextOverflow.ellipsis,
-          ),
-          iconTheme: const IconThemeData(color: Colors.white),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        title: Text(
+          widget.fileName,
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+          overflow: TextOverflow.ellipsis,
         ),
-        body: Stack(
-          children: [
-            // CONTENT
-            _isImage
-                ? Center(
-                    child: InteractiveViewer(
-                      // Allows zooming in/out of images
-                      child: Image.network(widget.fileUrl),
-                    ),
-                  )
-                : WebViewWidget(controller: _controller),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Stack(
+        children: [
+          // CONTENT
+          _isImage
+              ? Center(
+                  child: InteractiveViewer(
+                    // Allows zooming in/out of images
+                    child: Image.network(widget.fileUrl),
+                  ),
+                )
+              : WebViewWidget(controller: _controller),
 
-            // LOADING SPINNER
-            if (_isLoading)
-              const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              ),
-          ],
-        ),
+          // LOADING SPINNER
+          if (_isLoading)
+            const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+        ],
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // <--- Added this import
 import 'package:file_picker/file_picker.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:gcr/studypal/Models/class_schedule.dart';
@@ -12,7 +13,7 @@ class TeacherProvider with ChangeNotifier {
   final List<Map<String, dynamic>> _classes = [];
   List<Map<String, dynamic>> get classes => _classes;
 
-  // --- 1. CREATE CLASS (Modified) ---
+  // --- 1. CREATE CLASS (Fixed) ---
   Future<bool> createClass({
     required String subjectName,
     required String subjectCode,
@@ -23,12 +24,21 @@ class TeacherProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      // Get current logged in user
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        throw Exception("User not logged in");
+      }
+
       DocumentReference docRef = FirebaseFirestore.instance
           .collection('classes')
           .doc();
 
       Map<String, dynamic> classData = {
         'classId': docRef.id,
+        'teacherId': user
+            .uid, // <--- CRITICAL FIX: Saves the ID so you can query it later
         'subjectName': subjectName,
         'subjectCode': subjectCode,
         'teacherName': teacherName,

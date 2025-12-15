@@ -7,9 +7,9 @@ class AppTheme {
 
   // Primary: Blue-purple to light blue gradient
   static const List<Color> primaryGradient = [
-    Color(0xFF6B7AA8), // Soft blue-purple
-    Color(0xFF8FA3D0), // Mid blue
-    Color(0xFFD4E4F7), // Very light blue
+    Color(0xFF8A6CF6), // Soft Purple
+    Color(0xFFFFB74D), // Warm Orange
+    Color(0xFF4DD0E1), // Teal
   ];
 
   // Secondary: Purple to lavender gradient

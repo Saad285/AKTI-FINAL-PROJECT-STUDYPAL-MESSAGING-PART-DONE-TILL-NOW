@@ -156,11 +156,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                   gradient: LinearGradient(
                     begin: _topAlignmentAnimation.value,
                     end: _bottomAlignmentAnimation.value,
-                    colors: [
-                      const Color(0xFFE0F7FA),
-                      AppColors.primary.withOpacity(0.2),
-                      const Color(0xFFF3E5F5),
-                    ],
+                    colors: AppColors.universalGradient,
                   ),
                 ),
               ),

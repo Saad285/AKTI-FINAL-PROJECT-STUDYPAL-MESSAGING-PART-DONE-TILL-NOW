@@ -44,11 +44,7 @@ class _StudentHomepageState extends State<StudentHomepage> {
           borderRadius: BorderRadius.circular(50.r),
           child: Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: AppTheme.secondaryGradient,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(50.r),
               boxShadow: [
                 BoxShadow(

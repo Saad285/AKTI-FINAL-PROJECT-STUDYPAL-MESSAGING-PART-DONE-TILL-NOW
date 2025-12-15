@@ -76,7 +76,9 @@ class TodayScheduleWidget extends StatelessWidget {
         final schedules = snapshot.data!.docs;
 
         return Column(
-          children: schedules.map((doc) {
+          children: schedules.asMap().entries.map((entry) {
+            final idx = entry.key;
+            final doc = entry.value;
             final data = doc.data() as Map<String, dynamic>;
 
             // Determine Icon based on Type
@@ -86,10 +88,8 @@ class TodayScheduleWidget extends StatelessWidget {
               margin: EdgeInsets.only(bottom: 12.h),
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(
-                  20.r,
-                ), // Matches your screenshots
+                color: AppColors.randomAesthetic(idx).withOpacity(0.92),
+                borderRadius: BorderRadius.circular(20.r),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF404040).withOpacity(0.05),
@@ -106,14 +106,12 @@ class TodayScheduleWidget extends StatelessWidget {
                     height: 50.w,
                     width: 50.w,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(
-                        0.08,
-                      ), // Light background
+                      color: Colors.white.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(14.r),
                     ),
                     child: Icon(
                       Icons.access_time_rounded,
-                      color: AppColors.primary,
+                      color: Colors.white,
                       size: 24.sp,
                     ),
                   ),
@@ -130,7 +128,7 @@ class TodayScheduleWidget extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w700,
                             fontSize: 16.sp,
-                            color: Colors.black87,
+                            color: Colors.white,
                           ),
                         ),
                         SizedBox(height: 4.h),
@@ -141,7 +139,7 @@ class TodayScheduleWidget extends StatelessWidget {
                             Text(
                               "${data['time']}",
                               style: GoogleFonts.poppins(
-                                color: Colors.grey[600],
+                                color: Colors.white70,
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -151,13 +149,13 @@ class TodayScheduleWidget extends StatelessWidget {
                               child: Icon(
                                 Icons.circle,
                                 size: 4.sp,
-                                color: Colors.grey[300],
+                                color: Colors.white24,
                               ),
                             ),
                             Text(
                               data['type'] ?? 'On Campus',
                               style: GoogleFonts.poppins(
-                                color: Colors.grey[600],
+                                color: Colors.white70,
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -174,7 +172,7 @@ class TodayScheduleWidget extends StatelessWidget {
                                   ? Icons.link
                                   : Icons.location_on_outlined,
                               size: 14.sp,
-                              color: AppColors.primary,
+                              color: Colors.white,
                             ),
                             SizedBox(width: 4.w),
                             Expanded(
@@ -183,7 +181,7 @@ class TodayScheduleWidget extends StatelessWidget {
                                     ? (data['classLink'] ?? 'No Link')
                                     : "Room: ${data['roomNumber'] ?? 'N/A'}",
                                 style: GoogleFonts.poppins(
-                                  color: AppColors.primary,
+                                  color: Colors.white,
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w600,
                                 ),

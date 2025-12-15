@@ -7,7 +7,6 @@ import 'package:gcr/studypal/teachers/class_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gcr/studypal/theme/animated_background.dart';
 import 'package:gcr/studypal/theme/app_colors.dart';
 import 'package:gcr/studypal/students/buildinfocard.dart';
 import 'package:gcr/studypal/Authentication/loginpage.dart';
@@ -20,13 +19,11 @@ class Hometab extends StatefulWidget {
 }
 
 class _HometabState extends State<Hometab> {
-  // Variable to store the future so it doesn't re-run on every build
   late Future<DocumentSnapshot?> _userDataFuture;
 
   @override
   void initState() {
     super.initState();
-    // [PERFORMANCE FIX] Call the API only once when screen loads
     _userDataFuture = _fetchUserData();
   }
 
@@ -34,10 +31,7 @@ class _HometabState extends State<Hometab> {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) return null;
 
-    return await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
+    return FirebaseFirestore.instance.collection('users').doc(user.uid).get();
   }
 
   void _logout(BuildContext context) async {
@@ -54,12 +48,6 @@ class _HometabState extends State<Hometab> {
   Widget build(BuildContext context) {
     const Color infoTextColor = Colors.white;
 
-    final List<Color> backgroundColors = [
-      const Color(0xFFE0F7FA),
-      AppColors.primary.withOpacity(0.2),
-      const Color.fromARGB(255, 234, 234, 234),
-    ];
-
     return FutureBuilder<DocumentSnapshot?>(
       future: _userDataFuture,
       builder: (context, snapshot) {
@@ -69,23 +57,21 @@ class _HometabState extends State<Hometab> {
         if (snapshot.hasData &&
             snapshot.data != null &&
             snapshot.data!.exists) {
-          Map<String, dynamic> data =
-              snapshot.data!.data() as Map<String, dynamic>;
+          final data = snapshot.data!.data() as Map<String, dynamic>;
           userName = "Hello ${data['name'] ?? 'User'}";
-
-          // CHECK ROLE: Assumes your Firestore has a field 'role': 'teacher'
-          isTeacher = data['role'] == 'teacher';
+          final role = data['role'];
+          isTeacher =
+              role != null && role.toString().toLowerCase() == 'teacher';
         }
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
           appBar: AppBar(
             backgroundColor: AppColors.primary,
             elevation: 0,
             scrolledUnderElevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
-              tooltip: 'Open navigation menu',
               onPressed: () {},
             ),
             title: Text(
@@ -115,146 +101,152 @@ class _HometabState extends State<Hometab> {
               ),
             ],
           ),
-          body: AnimatedBackground(
-            colors: backgroundColors,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 1. THE HEADER
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 30.h),
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                      ),
-                    ),
-                    child: Text(
-                      userName,
-                      style: GoogleFonts.poppins(
-                        fontSize: 30.sp,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
+
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ---------- HEADER ----------
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 30.h),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
                     ),
                   ),
-
-                  SizedBox(height: 30.h),
-
-                  // 2. THE CONTENT
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isTeacher ? "My Dashboard" : "What's new",
-                          style: GoogleFonts.poppins(
-                            fontSize: 26.sp,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        userName,
+                        style: GoogleFonts.poppins(
+                          fontSize: 30.sp,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
                         ),
-                        SizedBox(height: 18.h),
+                      ),
+                      SizedBox(height: 6.h),
+                      Text(
+                        'Role: ${isTeacher ? 'Teacher' : 'Student'}',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12.sp,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-                        // DYNAMIC CARDS ROW
-                        Row(
-                          children: [
-                            GestureDetector(
+                SizedBox(height: 30.h),
+
+                // ---------- CONTENT ----------
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isTeacher ? "My Dashboard" : "What's new",
+                        style: GoogleFonts.poppins(
+                          fontSize: 26.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      SizedBox(height: 18.h),
+
+                      // INFO CARDS
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              if (isTeacher) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const ClassesListScreen(),
+                                  ),
+                                );
+                              }
+                            },
+                            child: IinfoCard(
+                              title: isTeacher ? "Active" : "Upcoming",
+                              number: isTeacher ? "3" : "7",
+                              subtitle: isTeacher ? "classes" : "exams",
+                              bgColor: const Color(0xFF757BC8),
+                              textColor: infoTextColor,
+                              width: 120,
+                            ),
+                          ),
+                          SizedBox(width: 14.w),
+                          Expanded(
+                            child: IinfoCard(
+                              title: "Pending",
+                              number: "16",
+                              subtitle: isTeacher ? "grading" : "homeworks",
+                              bgColor: const Color(0xFFFFB13D),
+                              textColor: infoTextColor,
+                              width: double.infinity,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 14.h),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
                               onTap: () {
                                 if (isTeacher) {
-                                  // Navigate to CLASSES LIST, not Create Class directly
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ClassesListScreen(),
+                                      builder: (_) => const CreateClassScreen(),
                                     ),
                                   );
                                 }
                               },
                               child: IinfoCard(
-                                title: isTeacher ? "Active" : "Upcoming",
-                                number: isTeacher ? "3" : "7",
-                                subtitle: isTeacher ? "classes" : "exams",
-                                bgColor: const Color(0xFF757BC8),
-                                textColor: infoTextColor,
-                                width: 120,
-                              ),
-                            ),
-                            SizedBox(width: 14.w),
-                            Expanded(
-                              child: IinfoCard(
-                                title: "Pending",
-                                number: "16",
-                                subtitle: isTeacher ? "grading" : "homeworks",
-                                bgColor: const Color(0xFFFFB13D),
+                                title: isTeacher ? "Create" : "New",
+                                number: isTeacher ? "+" : "3",
+                                subtitle: isTeacher ? "new class" : "classes",
+                                bgColor: isTeacher
+                                    ? Colors.green
+                                    : const Color(0xFFFFB13D),
                                 textColor: infoTextColor,
                                 width: double.infinity,
                               ),
                             ),
-                          ],
-                        ),
-                        SizedBox(height: 14.h),
-
-                        // ACTION ROW
-                        Row(
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (isTeacher) {
-                                    // Shortcut to Create Class
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const CreateClassScreen(),
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: IinfoCard(
-                                  title: isTeacher ? "Create" : "New",
-                                  number: isTeacher ? "+" : "3",
-                                  subtitle: isTeacher ? "new class" : "classes",
-                                  bgColor: isTeacher
-                                      ? Colors.green
-                                      : const Color(0xFFFFB13D),
-                                  textColor: infoTextColor,
-                                  width: double.infinity,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 14.w),
-                            const UnreadChatsCard(),
-                          ],
-                        ),
-
-                        SizedBox(height: 30.h),
-                        Text(
-                          "Today's schedule",
-                          style: GoogleFonts.poppins(
-                            fontSize: 26.sp,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
                           ),
+                          SizedBox(width: 14.w),
+                          const UnreadChatsCard(),
+                        ],
+                      ),
+
+                      SizedBox(height: 30.h),
+
+                      Text(
+                        "Today's schedule",
+                        style: GoogleFonts.poppins(
+                          fontSize: 26.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
                         ),
-                        SizedBox(height: 14.h),
+                      ),
+                      SizedBox(height: 14.h),
 
-                        // [CHANGED] Using the Live Widget instead of static cards
-                        const TodayScheduleWidget(),
+                      const TodayScheduleWidget(),
 
-                        SizedBox(height: 120.h),
-                      ],
-                    ),
+                      SizedBox(height: 120.h),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );

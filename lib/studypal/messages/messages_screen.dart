@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gcr/studypal/theme/animated_background.dart';
 import 'package:gcr/studypal/theme/app_colors.dart';
 import '../Models/chat_models.dart';
 import 'chat_detail_screen.dart';
@@ -171,14 +170,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
             ],
           ),
         ),
-        body: AnimatedBackground(
-          colors: _bgColors,
-          child: TabBarView(
-            children: [
-              _buildFirestoreList(_teacherStream),
-              _buildFirestoreList(_studentStream),
-            ],
-          ),
+        body: TabBarView(
+          children: [
+            _buildFirestoreList(_teacherStream),
+            _buildFirestoreList(_studentStream),
+          ],
         ),
       ),
     );
