@@ -13,8 +13,6 @@ import 'class_detail_screen.dart';
 class ClassesListScreen extends StatelessWidget {
   const ClassesListScreen({super.key});
 
-  /// Checks if the current user has a 'Teacher' role in Firestore.
-  /// Returns true if the user is a teacher, false otherwise.
   Future<bool> _isTeacher() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) return false;
@@ -24,7 +22,29 @@ class ClassesListScreen extends StatelessWidget {
         .doc(user.uid)
         .get();
 
-    return (doc.data() as Map<String, dynamic>)['role'] == 'Teacher';
+    if (!doc.exists) return false;
+    return (doc.data() as Map<String, dynamic>)['role'] == 'teacher';
+  }
+
+  // --- DELETE FUNCTION ---
+  Future<void> _deleteClass(String classId, BuildContext context) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('classes')
+          .doc(classId)
+          .delete();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Class deleted successfully")),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error deleting class: $e")));
+      }
+    }
   }
 
   @override
@@ -32,9 +52,8 @@ class ClassesListScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     return FutureBuilder<bool>(
-      future: _isTeacher(), // Determine user role (Teacher or Student)
+      future: _isTeacher(),
       builder: (context, roleSnapshot) {
-        // Default to student role while role data is being fetched
         bool isTeacher = roleSnapshot.data ?? false;
 
         return AnimatedBackground(
@@ -43,7 +62,7 @@ class ClassesListScreen extends StatelessWidget {
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               title: Text(
-                "My Classes",
+                isTeacher ? "My Created Classes" : "All Classes",
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -57,8 +76,7 @@ class ClassesListScreen extends StatelessWidget {
 
             floatingActionButton: isTeacher
                 ? Padding(
-                    // Offset the floating action button to avoid overlap with bottom navigation bar
-                    padding: EdgeInsets.only(bottom: 100.h),
+                    padding: EdgeInsets.only(bottom: 20.h),
                     child: FloatingActionButton(
                       backgroundColor: AppColors.primary,
                       child: const Icon(Icons.add, color: Colors.white),
@@ -75,12 +93,23 @@ class ClassesListScreen extends StatelessWidget {
                 : null,
 
             body: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('subjects')
-                  .snapshots(),
+              stream: isTeacher
+                  ? FirebaseFirestore.instance
+                        .collection('classes')
+                        .where('teacherId', isEqualTo: user?.uid)
+                        .orderBy('createdAt', descending: true)
+                        .snapshots()
+                  : FirebaseFirestore.instance
+                        .collection('classes')
+                        .orderBy('createdAt', descending: true)
+                        .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
                 }
 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -95,7 +124,9 @@ class ClassesListScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 10.h),
                         Text(
-                          "No classes found.",
+                          isTeacher
+                              ? "You haven't created any classes yet."
+                              : "No classes available.",
                           style: GoogleFonts.poppins(color: Colors.grey),
                         ),
                       ],
@@ -107,76 +138,128 @@ class ClassesListScreen extends StatelessWidget {
 
                 return ListView.builder(
                   itemCount: docs.length,
-                  // Add bottom padding to ensure list content is not hidden behind the navigation bar
-                  padding: EdgeInsets.only(
-                    bottom: 100.h,
-                    left: 16.w,
-                    right: 16.w,
-                    top: 16.h,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 16.h,
                   ),
                   itemBuilder: (context, index) {
                     final data = docs[index].data() as Map<String, dynamic>;
+                    String classId = docs[index].id;
 
                     SubjectModel subject = SubjectModel(
-                      id: docs[index].id,
+                      id: classId,
                       subjectName: data['subjectName'] ?? 'Unknown',
                       subjectCode: data['subjectCode'] ?? '---',
                       teacherId: data['teacherId'] ?? '',
                       teacherName: data['teacherName'] ?? 'Teacher',
                     );
 
-                    // Determine if the current user is the teacher who created this class
-                    bool isMyClass = (user?.uid == subject.teacherId);
-
-                    return Card(
-                      elevation: 2,
-                      margin: EdgeInsets.only(bottom: 12.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
+                    // --- [CHANGED] WRAP CARD IN DISMISSIBLE ---
+                    return Dismissible(
+                      key: Key(classId),
+                      direction: isTeacher
+                          ? DismissDirection
+                                .endToStart // Swipe Left only
+                          : DismissDirection.none, // Disable for students
+                      // Background shown when swiping
+                      background: Container(
+                        margin: EdgeInsets.only(bottom: 12.h),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        alignment: Alignment.centerRight,
+                        padding: EdgeInsets.only(right: 20.w),
+                        child: const Icon(Icons.delete, color: Colors.white),
                       ),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(16.w),
-                        leading: CircleAvatar(
-                          backgroundColor: AppColors.primary.withOpacity(0.1),
-                          child: Text(
-                            subject.subjectCode.isNotEmpty
-                                ? subject.subjectCode.substring(0, 1)
-                                : "C",
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+
+                      // Confirmation Dialog
+                      confirmDismiss: (direction) async {
+                        return await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Delete Class?"),
+                              content: const Text(
+                                "Are you sure you want to delete this class? This cannot be undone.",
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: const Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.red,
+                                  ),
+                                  child: const Text("Delete"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+
+                      // Perform Delete
+                      onDismissed: (direction) {
+                        _deleteClass(classId, context);
+                      },
+
+                      child: Card(
+                        elevation: 2,
+                        margin: EdgeInsets.only(bottom: 12.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
-                        title: Text(
-                          subject.subjectName,
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        subtitle: Text(
-                          "Code: ${subject.subjectCode} • ${subject.teacherName}",
-                          style: GoogleFonts.poppins(
-                            fontSize: 12.sp,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        trailing: const Icon(
-                          Icons.arrow_forward_ios,
-                          size: 16,
-                          color: Colors.grey,
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ClassDetailScreen(
-                                subject: subject,
-                                isTeacher: isMyClass,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.all(16.w),
+                          leading: CircleAvatar(
+                            backgroundColor: AppColors.primary.withOpacity(0.1),
+                            child: Text(
+                              subject.subjectName.isNotEmpty
+                                  ? subject.subjectName
+                                        .substring(0, 1)
+                                        .toUpperCase()
+                                  : "C",
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          );
-                        },
+                          ),
+                          title: Text(
+                            subject.subjectName,
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "Code: ${subject.subjectCode} • ${subject.teacherName}",
+                            style: GoogleFonts.poppins(
+                              fontSize: 12.sp,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ClassDetailScreen(
+                                  subject: subject,
+                                  isTeacher: user?.uid == subject.teacherId,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     );
                   },

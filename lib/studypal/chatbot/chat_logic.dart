@@ -6,7 +6,7 @@ class ChatLogic {
   final Gemini gemini = Gemini.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  // --- RETRY HELPER (Network issues handle karne ke liye) ---
+  // Retry helper for handling network issues and rate limiting
   Future<T?> _withRetry<T>(Future<T?> Function() fn, {int retries = 3}) async {
     int attempt = 0;
     while (true) {
@@ -15,9 +15,10 @@ class ChatLogic {
       } catch (e) {
         attempt++;
         final msg = e.toString();
-        // Agar rate limit (429) aye toh wait karke retry karega
+        // If rate limit (429) is hit, wait and retry
         if (attempt <= retries && msg.contains('429')) {
           final wait = Duration(seconds: 1 << (attempt - 1));
+          print('Rate limited. Retrying in ${wait.inSeconds} seconds...');
           await Future.delayed(wait);
           continue;
         }
@@ -26,15 +27,15 @@ class ChatLogic {
     }
   }
 
-  // --- FUNCTION 1: Get Answer (RAG - Optimized & Fixed) ---
+  // Get AI response to user question with semantic search in notes (RAG)
   Future<String> getAnswer(String userQuestion) async {
-    // Validation: Agar sawal khali hai toh API call mat karo
+    // Validation: Do not make API call if question is empty
     if (userQuestion.trim().isEmpty) {
       return "Please enter a valid question.";
     }
 
     try {
-      // [FIX HERE] Model Name: 'text-embedding-004' use karna zaroori hai
+      // Step 1: Get embedding of user question using text-embedding-004 model
       final rawResult = await _withRetry(
         () =>
             gemini.embedContent(userQuestion, modelName: 'text-embedding-004'),
@@ -42,23 +43,24 @@ class ChatLogic {
 
       List<double> queryVector = [];
 
-      // Safe Type Casting
+      // Safe type casting from response
       if (rawResult != null) {
-        // Check agar response list hai
+        // Check if response is a list
         if (rawResult is List) {
           queryVector = rawResult.map((e) => (e as num).toDouble()).toList();
         } else {
-          return "Error: Internal AI Format Mismatch.";
+          return "Error: Internal AI format mismatch.";
         }
       } else {
-        return "Sorry, I couldn't understand the question (Embedding failed).";
+        return "Sorry, I couldn't understand the question (embedding failed).";
       }
 
-      // 2. Fetch Notes from Firebase
+      // Step 2: Fetch saved notes from Firebase
       QuerySnapshot snapshot = await firestore.collection('notes').get();
 
       List<Map<String, dynamic>> scoredNotes = [];
 
+      // Step 3: Score each note based on semantic similarity
       for (var doc in snapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
@@ -69,28 +71,28 @@ class ChatLogic {
 
           double score = _calculateSimilarity(queryVector, noteVector);
 
-          // Threshold 0.60
+          // Keep notes above similarity threshold of 0.60
           if (score > 0.60) {
             scoredNotes.add({'content': data['content'], 'score': score});
           }
         }
       }
 
-      // 3. Top 3 Matches Logic
+      // Step 4: Get top 3 matching notes
       scoredNotes.sort((a, b) => b['score'].compareTo(a['score']));
       var topMatches = scoredNotes.take(3).toList();
 
       String contextString = "";
       if (topMatches.isNotEmpty) {
-        contextString = "Relevant Info from Notes:\n";
+        contextString = "Relevant information from your notes:\n";
         for (var note in topMatches) {
           contextString += "- ${note['content']}\n";
         }
       }
 
-      // 4. Prompt Construction
+      // Step 5: Build prompt with context for AI response
       String fullPrompt =
-          "You are 'Study Pal', a helpful classroom assistant.\n"
+          "You are 'StudyPal', a helpful classroom assistant.\n"
           "Answer the user's question using the notes provided below. "
           "If the answer isn't in the notes, say 'I couldn't find this in your notes' and then try to answer from general knowledge.\n\n"
           "$contextString\n"
@@ -103,24 +105,24 @@ class ChatLogic {
       return response?.output ?? "Sorry, no response from AI.";
     } catch (e) {
       print("Error in getAnswer: $e");
-      // UI par exact error dikhane ke liye
+      // Show exact error to help with debugging
       return "Error: Something went wrong. Details: $e";
     }
   }
 
-  // --- FUNCTION 2: Save Note ---
+  // Save note to Firestore with semantic embedding for future retrieval
   Future<void> saveNoteToMemory(String title, String content) async {
-    // Validation: Khali note save mat karo
+    // Validation: Do not save empty notes
     if (content.trim().isEmpty) return;
 
     try {
-      // [FIX HERE TOO] Note save karte waqt bhi naya model use karo
+      // Generate embedding for the note using text-embedding-004 model
       final rawEmbedding = await _withRetry(
         () => gemini.embedContent(content, modelName: 'text-embedding-004'),
       );
 
       if (rawEmbedding != null) {
-        // Safe casting
+        // Safe type casting
         List<double> embedding = [];
         if (rawEmbedding is List) {
           embedding = rawEmbedding.map((e) => (e as num).toDouble()).toList();
@@ -141,13 +143,13 @@ class ChatLogic {
     }
   }
 
-  // --- MATHS HELPER (Cosine Similarity) ---
+  // Calculate cosine similarity between two embedding vectors
   double _calculateSimilarity(List<double> vecA, List<double> vecB) {
     var dotProduct = 0.0;
     var normA = 0.0;
     var normB = 0.0;
 
-    // Safety: Use the smaller length to avoid index out of bounds
+    // Use the smaller length to avoid index out of bounds
     int length = min(vecA.length, vecB.length);
 
     for (int i = 0; i < length; i++) {

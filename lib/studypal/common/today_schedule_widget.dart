@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // Ensure ScreenUtil is imported
+import 'package:gcr/studypal/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../theme/app_colors.dart';
 
 class TodayScheduleWidget extends StatelessWidget {
   const TodayScheduleWidget({super.key});
@@ -25,17 +26,50 @@ class TodayScheduleWidget extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: SizedBox(
+              height: 20.h,
+              width: 20.w,
+              child: const CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          // Empty State - Matching App Aesthetic
           return Container(
-            padding: const EdgeInsets.all(20),
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 25.h, horizontal: 20.w),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(20.r),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF404040).withOpacity(0.05),
+                  spreadRadius: 0,
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: const Center(child: Text("No classes scheduled for today.")),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.event_busy_rounded,
+                  size: 40.sp,
+                  color: Colors.grey[300],
+                ),
+                SizedBox(height: 10.h),
+                Text(
+                  "No classes today",
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey[400],
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           );
         }
 
@@ -44,62 +78,119 @@ class TodayScheduleWidget extends StatelessWidget {
         return Column(
           children: schedules.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
+
+            // Determine Icon based on Type
+            final isOnline = data['type'] == 'Online';
+
             return Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(15),
+              margin: EdgeInsets.only(bottom: 12.h),
+              padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(
+                  20.r,
+                ), // Matches your screenshots
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
+                    color: const Color(0xFF404040).withOpacity(0.05),
+                    spreadRadius: 0,
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
                   ),
                 ],
               ),
               child: Row(
                 children: [
+                  // --- ICON CONTAINER ---
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    height: 50.w,
+                    width: 50.w,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.primary.withOpacity(
+                        0.08,
+                      ), // Light background
+                      borderRadius: BorderRadius.circular(14.r),
                     ),
-                    child: const Icon(
-                      Icons.access_time,
+                    child: Icon(
+                      Icons.access_time_rounded,
                       color: AppColors.primary,
+                      size: 24.sp,
                     ),
                   ),
-                  const SizedBox(width: 15),
+                  SizedBox(width: 16.w),
+
+                  // --- TEXT CONTENT ---
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Subject Name
                         Text(
                           data['subjectName'] ?? 'Subject',
                           style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16.sp,
+                            color: Colors.black87,
                           ),
                         ),
-                        Text(
-                          "${data['time']} • ${data['type']}",
-                          style: GoogleFonts.poppins(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
+                        SizedBox(height: 4.h),
+
+                        // Time & Type
+                        Row(
+                          children: [
+                            Text(
+                              "${data['time']}",
+                              style: GoogleFonts.poppins(
+                                color: Colors.grey[600],
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 6.w),
+                              child: Icon(
+                                Icons.circle,
+                                size: 4.sp,
+                                color: Colors.grey[300],
+                              ),
+                            ),
+                            Text(
+                              data['type'] ?? 'On Campus',
+                              style: GoogleFonts.poppins(
+                                color: Colors.grey[600],
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          data['type'] == 'On Campus'
-                              ? "Room: ${data['roomNumber']}"
-                              : "Link: ${data['classLink']}",
-                          style: GoogleFonts.poppins(
-                            color: AppColors.primary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        SizedBox(height: 4.h),
+
+                        // Location (Room or Link)
+                        Row(
+                          children: [
+                            Icon(
+                              isOnline
+                                  ? Icons.link
+                                  : Icons.location_on_outlined,
+                              size: 14.sp,
+                              color: AppColors.primary,
+                            ),
+                            SizedBox(width: 4.w),
+                            Expanded(
+                              child: Text(
+                                isOnline
+                                    ? (data['classLink'] ?? 'No Link')
+                                    : "Room: ${data['roomNumber'] ?? 'N/A'}",
+                                style: GoogleFonts.poppins(
+                                  color: AppColors.primary,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

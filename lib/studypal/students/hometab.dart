@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gcr/studypal/common/classes_list_screen.dart';
+import 'package:gcr/studypal/common/today_schedule_widget.dart';
 import 'package:gcr/studypal/messages/unread_chats_card.dart';
 import 'package:gcr/studypal/teachers/class_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,11 +10,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gcr/studypal/theme/animated_background.dart';
 import 'package:gcr/studypal/theme/app_colors.dart';
 import 'package:gcr/studypal/students/buildinfocard.dart';
-import 'package:gcr/studypal/students/schedulecard.dart';
 import 'package:gcr/studypal/Authentication/loginpage.dart';
 
-class Hometab extends StatelessWidget {
+class Hometab extends StatefulWidget {
   const Hometab({super.key});
+
+  @override
+  State<Hometab> createState() => _HometabState();
+}
+
+class _HometabState extends State<Hometab> {
+  // Variable to store the future so it doesn't re-run on every build
+  late Future<DocumentSnapshot?> _userDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // [PERFORMANCE FIX] Call the API only once when screen loads
+    _userDataFuture = _fetchUserData();
+  }
 
   Future<DocumentSnapshot?> _fetchUserData() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -45,7 +61,7 @@ class Hometab extends StatelessWidget {
     ];
 
     return FutureBuilder<DocumentSnapshot?>(
-      future: _fetchUserData(),
+      future: _userDataFuture,
       builder: (context, snapshot) {
         String userName = "Loading...";
         bool isTeacher = false;
@@ -56,6 +72,8 @@ class Hometab extends StatelessWidget {
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
           userName = "Hello ${data['name'] ?? 'User'}";
+
+          // CHECK ROLE: Assumes your Firestore has a field 'role': 'teacher'
           isTeacher = data['role'] == 'teacher';
         }
 
@@ -67,6 +85,7 @@ class Hometab extends StatelessWidget {
             scrolledUnderElevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
+              tooltip: 'Open navigation menu',
               onPressed: () {},
             ),
             title: Text(
@@ -145,13 +164,27 @@ class Hometab extends StatelessWidget {
                         // DYNAMIC CARDS ROW
                         Row(
                           children: [
-                            IinfoCard(
-                              title: isTeacher ? "Active" : "Upcoming",
-                              number: isTeacher ? "3" : "7",
-                              subtitle: isTeacher ? "classes" : "exams",
-                              bgColor: const Color(0xFF757BC8),
-                              textColor: infoTextColor,
-                              width: 120,
+                            GestureDetector(
+                              onTap: () {
+                                if (isTeacher) {
+                                  // Navigate to CLASSES LIST, not Create Class directly
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ClassesListScreen(),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: IinfoCard(
+                                title: isTeacher ? "Active" : "Upcoming",
+                                number: isTeacher ? "3" : "7",
+                                subtitle: isTeacher ? "classes" : "exams",
+                                bgColor: const Color(0xFF757BC8),
+                                textColor: infoTextColor,
+                                width: 120,
+                              ),
                             ),
                             SizedBox(width: 14.w),
                             Expanded(
@@ -168,13 +201,14 @@ class Hometab extends StatelessWidget {
                         ),
                         SizedBox(height: 14.h),
 
-                        // ACTION ROW (Create Class / Join Class)
+                        // ACTION ROW
                         Row(
                           children: [
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
                                   if (isTeacher) {
+                                    // Shortcut to Create Class
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -202,8 +236,6 @@ class Hometab extends StatelessWidget {
                         ),
 
                         SizedBox(height: 30.h),
-
-                        // SCHEDULE HEADER
                         Text(
                           "Today's schedule",
                           style: GoogleFonts.poppins(
@@ -214,27 +246,8 @@ class Hometab extends StatelessWidget {
                         ),
                         SizedBox(height: 14.h),
 
-                        // Hardcoded schedule cards
-                        ScheduleCard(
-                          subject: "Mathematics",
-                          details: "Room 101",
-                          startTime: "9:00 AM",
-                          isOnline: false,
-                        ),
-                        SizedBox(height: 12.h),
-                        ScheduleCard(
-                          subject: "Physics",
-                          details: "https://zoom.us/j/123",
-                          startTime: "11:00 AM",
-                          isOnline: true,
-                        ),
-                        SizedBox(height: 12.h),
-                        ScheduleCard(
-                          subject: "Chemistry",
-                          details: "Lab 02",
-                          startTime: "2:00 PM",
-                          isOnline: false,
-                        ),
+                        // [CHANGED] Using the Live Widget instead of static cards
+                        const TodayScheduleWidget(),
 
                         SizedBox(height: 120.h),
                       ],
