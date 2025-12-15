@@ -6,6 +6,8 @@ import 'package:gcr/studypal/messages/messages_screen.dart';
 import 'package:gcr/studypal/students/hometab.dart';
 import 'package:gcr/studypal/theme/app_colors.dart';
 import 'package:gcr/studypal/theme/app_theme.dart';
+
+class StudentHomepage extends StatefulWidget {
   const StudentHomepage({super.key});
 
   @override

@@ -208,57 +208,122 @@ class ClassesListScreen extends StatelessWidget {
                         _deleteClass(classId, context);
                       },
 
-                      child: Card(
-                        elevation: 2,
-                        margin: EdgeInsets.only(bottom: 12.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.all(16.w),
-                          leading: CircleAvatar(
-                            backgroundColor: AppColors.primary.withOpacity(0.1),
-                            child: Text(
-                              subject.subjectName.isNotEmpty
-                                  ? subject.subjectName
-                                        .substring(0, 1)
-                                        .toUpperCase()
-                                  : "C",
-                              style: const TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ClassDetailScreen(
+                                subject: subject,
+                                isTeacher: user?.uid == subject.teacherId,
                               ),
                             ),
-                          ),
-                          title: Text(
-                            subject.subjectName,
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w600,
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 12.h),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: AppTheme.secondaryGradient,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
+                            borderRadius: BorderRadius.circular(20.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withOpacity(0.15),
+                                blurRadius: 12,
+                                spreadRadius: 0,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          subtitle: Text(
-                            "Code: ${subject.subjectCode} • ${subject.teacherName}",
-                            style: GoogleFonts.poppins(
-                              fontSize: 12.sp,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          trailing: const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16,
-                            color: Colors.grey,
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ClassDetailScreen(
-                                  subject: subject,
-                                  isTeacher: user?.uid == subject.teacherId,
+                          child: Padding(
+                            padding: EdgeInsets.all(20.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Category and notification icon
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Tutorials",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12.sp,
+                                        color: Colors.white.withOpacity(0.8),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.notifications_active_outlined,
+                                      color: Colors.white.withOpacity(0.7),
+                                      size: 20,
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            );
-                          },
+                                SizedBox(height: 12.h),
+                                // Subject name (large title)
+                                Text(
+                                  subject.subjectName,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 22.sp,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 8.h),
+                                // Type label
+                                Text(
+                                  "classes",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12.sp,
+                                    color: Colors.white.withOpacity(0.75),
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                SizedBox(height: 16.h),
+                                // Bottom row with mode badge
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Practical",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 13.sp,
+                                        color: Colors.white.withOpacity(0.85),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 12.w,
+                                        vertical: 6.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.25),
+                                        borderRadius: BorderRadius.circular(
+                                          12.r,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "Online",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 11.sp,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     );
