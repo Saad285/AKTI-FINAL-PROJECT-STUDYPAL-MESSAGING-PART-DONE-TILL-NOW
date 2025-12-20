@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gcr/studypal/theme/app_colors.dart';
 
@@ -89,7 +90,7 @@ class _SplashScreenState extends State<SplashScreen>
                 children: [
                   Text(
                         'StudyPal',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 42,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
@@ -109,7 +110,7 @@ class _SplashScreenState extends State<SplashScreen>
                   const SizedBox(height: 12),
                   Text(
                         'Your Learning Companion',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.white.withOpacity(0.9),

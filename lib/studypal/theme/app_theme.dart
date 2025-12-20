@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTheme {
@@ -33,7 +34,7 @@ class AppTheme {
       elevation: 0,
       centerTitle: true,
       iconTheme: const IconThemeData(color: Colors.white),
-      titleTextStyle: TextStyle(
+      titleTextStyle: GoogleFonts.poppins(
         fontSize: 20,
         fontWeight: FontWeight.bold,
         color: Colors.white,

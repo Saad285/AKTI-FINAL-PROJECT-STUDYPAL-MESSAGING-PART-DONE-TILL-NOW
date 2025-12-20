@@ -117,18 +117,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
               ? TextField(
                   controller: _searchController,
                   onChanged: _updateSearch,
-                  style: const TextStyle(color: Colors.white),
+                  style: GoogleFonts.poppins(color: Colors.white),
                   cursorColor: Colors.white,
                   autofocus: true,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Search user...',
-                    hintStyle: TextStyle(color: Colors.white70),
+                    hintStyle: GoogleFonts.poppins(color: Colors.white70),
                     border: InputBorder.none,
                   ),
                 )
-              : const Text(
+              : Text(
                   "Messages",
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 22,
@@ -152,13 +152,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
               },
             ),
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             indicatorColor: Colors.white,
             indicatorWeight: 3,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white60,
-            labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            tabs: [
+            labelStyle: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+            tabs: const [
               Tab(text: "Teachers"),
               Tab(text: "Students"),
             ],

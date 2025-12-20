@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gcr/studypal/theme/app_colors.dart';
 
 enum ReminderType { assignment, quiz, note }
@@ -431,9 +432,9 @@ class _RemindersScreenState extends State<RemindersScreen>
                               ),
                             ),
                             const SizedBox(width: 14),
-                            const Text(
+                            Text(
                               'Add New Reminder',
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
@@ -480,10 +481,10 @@ class _RemindersScreenState extends State<RemindersScreen>
                                     Icons.title_rounded,
                                     color: AppColors.primary,
                                   ),
-                                  hintStyle: TextStyle(
+                                  hintStyle: GoogleFonts.poppins(
                                     color: AppColors.onSurface.withOpacity(0.4),
                                   ),
-                                  labelStyle: TextStyle(
+                                  labelStyle: GoogleFonts.poppins(
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -520,10 +521,10 @@ class _RemindersScreenState extends State<RemindersScreen>
                                   hintText:
                                       'Add additional details or notes...',
                                   alignLabelWithHint: true,
-                                  hintStyle: TextStyle(
+                                  hintStyle: GoogleFonts.poppins(
                                     color: AppColors.onSurface.withOpacity(0.4),
                                   ),
-                                  labelStyle: TextStyle(
+                                  labelStyle: GoogleFonts.poppins(
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -630,16 +631,16 @@ class _RemindersScreenState extends State<RemindersScreen>
                                         size: 20,
                                       ),
                                     ),
-                                    title: const Text(
+                                    title: Text(
                                       'Due Date',
-                                      style: TextStyle(
+                                      style: GoogleFonts.poppins(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 13,
                                       ),
                                     ),
                                     subtitle: Text(
                                       _formatDate(selectedDate),
-                                      style: TextStyle(
+                                      style: GoogleFonts.poppins(
                                         color: AppColors.primary,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -764,9 +765,9 @@ class _RemindersScreenState extends State<RemindersScreen>
               ),
             ),
           ),
-          title: const Text(
+          title: Text(
             'My Reminders',
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.w700,
@@ -1009,7 +1010,7 @@ class _RemindersScreenState extends State<RemindersScreen>
                           const SizedBox(height: 20),
                           Text(
                             'No Reminders Yet',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               fontSize: 26,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primary,
@@ -1020,7 +1021,7 @@ class _RemindersScreenState extends State<RemindersScreen>
                           Text(
                             'Stay organized and never miss a deadline',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: AppColors.onSurface.withOpacity(0.7),
@@ -1117,7 +1118,7 @@ class _RemindersScreenState extends State<RemindersScreen>
           Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               color: color,
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -1502,7 +1503,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                       ),
                       child: Text(
                         widget.typeLabel,
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           color: widget.accent,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,

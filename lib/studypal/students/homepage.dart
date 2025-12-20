@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gcr/studypal/chatbot/chat_bot_screen.dart';
 import 'package:gcr/studypal/common/classes_list_screen.dart';
 import 'package:gcr/studypal/messages/messages_screen.dart';
@@ -90,7 +91,7 @@ class _StudentHomepageState extends State<StudentHomepage> {
                   const SizedBox(height: 12),
                   Text(
                     'StudyPal',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -103,7 +104,10 @@ class _StudentHomepageState extends State<StudentHomepage> {
               leading: Icon(Icons.logout, color: AppColors.primary),
               title: Text(
                 'Logout',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -115,7 +119,7 @@ class _StudentHomepageState extends State<StudentHomepage> {
               leading: Icon(Icons.delete_forever, color: Colors.red),
               title: Text(
                 'Delete Account',
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: Colors.red,
@@ -130,7 +134,10 @@ class _StudentHomepageState extends State<StudentHomepage> {
               leading: Icon(Icons.settings, color: AppColors.primary),
               title: Text(
                 'Settings',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               onTap: () {
                 Navigator.pop(context);
